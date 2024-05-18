@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Privacy Protector</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #3a3f52;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #ffffff;
+            font-size: 24px; /* 기본 폰트 사이즈 */
+        }
+
+        .container {
+            width: 90%;
+            text-align: center;
+        }
+
+        .instruction {
+            margin-top: 20px;
+            margin-bottom: 40px; /* 간격 확대 */
+            text-align: center; /* 문구 가운데 정렬 */
+            font-size: 28px; /* 문구 글자 크기 키움 */
+            padding-bottom: 20px;
+            font-weight: 700;
+        }
+
+        button {
+            font-size: 24px;
+            color: #3a3f52;
+            background-color: #6fec02;
+            padding: 20px 30px;
+            margin-top: 10px;
+            margin-bottom: 20px; /* 버튼 간의 간격 조정 */
+            border: none;
+            border-radius: 10px;
+            width: 80%; /* 버튼 너비 조정 */
+            max-width: 300px; /* 최대 너비 설정 */
+            font-weight: 400;
+        }
+
+        #cameraButton {
+            font-size: 28px; /* Camera 버튼의 글씨 크기 조정 */
+        }
+
+        #galleryButton {
+            font-size: 28px; /* Gallery 버튼의 글씨 크기 조정 */
+        }
+
+        #backButton {
+            position: fixed;
+            top: 10px; /* 상단 여백 추가 */
+            left: 10px; /* 좌측 여백 추가 */
+            font-size: 30px; /* 백 아이콘 폰트 사이즈 감소 */
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #3a3f52; /* 아이콘 색상 추가 */
+            padding: 10px; /* 패딩 조정 */
+            width: 70px; /* 버튼 너비 설정 */
+        }
+
+        .icon {
+            font-size: 60px; /* 아이콘 크기 조정 */
+            margin-bottom: 50px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #6c757d; /* 회색 */
+            font-size: 18px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+<button id="backButton" onclick="history.back()">&#60;</button>
+<div class="instruction"><b>단 한 장의 사진으로<br>당신의 얼굴을 학습시키세요!</b></div>
+<i class="icon">&#9757;</i> <!-- 손가락 아이콘, 유니코드 사용 -->
+<div class="container">
+    <button id="cameraButton" onclick="window.location.href='/train_camera';">Camera</button>
+    <button id="galleryButton" onclick="window.location.href='/train_gallery';">Gallery</button>
+</div>
+<footer>We are P.P</footer>
+</body>
+</html>

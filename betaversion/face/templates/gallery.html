@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사진/동영상 선택</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #3a3f52;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #ffffff;
+            font-size: 24px;
+        }
+
+        .container {
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 40px;
+            font-weight: 700;
+        }
+
+        button {
+            font-size: 28px;
+            color: #3a3f52;
+            background-color: #6fec02;
+            padding: 20px 30px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 300px;
+            font-weight: 400;
+        }
+
+        #backButton {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #3a3f52;
+            padding: 10px;
+            width: 70px;
+        }
+
+        #convertButton {
+            display: block;
+            margin: 20px auto 0 auto;
+        }
+
+        #progressContainer {
+            display: none;
+            width: 100%;
+            max-width: 450px;
+            height: 30px;
+            background-color: #f3f3f3;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #progressBar {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #progressFill {
+            width: 0;
+            height: 100%;
+            background-color: #6fec02;
+            text-align: center;
+            color: white;
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+<button id="backButton" onclick="history.back()">&#60;</button>
+<div class="container">
+    <h1>사진/동영상 선택하기</h1>
+    <button id="galleryButton" onclick="document.getElementById('fileInput').click()">Gallery</button>
+    <input type="file" accept="image/*,video/*" id="fileInput" style="display:none;">
+    <div id="preview"></div>
+    <button id="convertButton" style="display:none;" onclick="convertMedia()">Convert</button>
+    <div id="progressContainer">
+        <div id="progressBar">
+            <div id="progressFill">0%</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const progressFill = document.getElementById('progressFill');
+        const progressContainer = document.getElementById('progressContainer');
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('progress', (data) => {
+            console.log('Progress event received:', data);
+            progressContainer.style.display = 'block';
+            progressFill.style.width = `${data.progress}%`;
+            progressFill.textContent = `${data.progress}%`;
+        });
+
+        socket.on('complete', (data) => {
+            console.log('Complete event received:', data);
+            window.location.href = data.url;
+        });
+
+        function convertMedia() {
+            const mediaType = localStorage.getItem('mediaType');
+            if (mediaType === 'image') {
+                window.location.href = 'gallery_convert';
+            } else if (mediaType === 'video') {
+                const selectedMedia = localStorage.getItem('selectedMedia');
+                const blob = dataURLToBlob(selectedMedia);
+                const formData = new FormData();
+                formData.append('test_video', blob, 'test_video.mp4');
+
+                fetch('/process_video', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok.');
+                }).then(data => {
+                    console.log(data);
+                    localStorage.setItem('resultVideoUrl', '/static/outputs/result_video_with_audio.mp4');  // Save result video URL to localStorage
+                }).catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                });
+            }
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            var preview = document.getElementById('preview');
+            var convertButton = document.getElementById('convertButton');
+            var galleryButton = document.getElementById('galleryButton');
+            preview.innerHTML = '';
+            if (e.target.files.length === 1) {
+                var file = e.target.files[0];
+                var fileType = file.type.split('/')[0];
+                var previewElement;
+
+                if (fileType === 'image') {
+                    previewElement = document.createElement('img');
+                    previewElement.style.maxWidth = '200px';
+                    previewElement.style.maxHeight = '200px';
+                } else if (fileType === 'video') {
+                    previewElement = document.createElement('video');
+                    previewElement.controls = true;
+                    previewElement.style.maxWidth = '200px';
+                    previewElement.style.maxHeight = '200px';
+                }
+
+                previewElement.src = URL.createObjectURL(file);
+                previewElement.onload = function () {
+                    URL.revokeObjectURL(this.src);
+                }
+                preview.appendChild(previewElement);
+                convertButton.style.display = 'block';
+                galleryButton.textContent = 'Reselect';
+
+                // Save the selected media to localStorage
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    localStorage.setItem('selectedMedia', event.target.result);
+                    localStorage.setItem('mediaType', fileType);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('한 개의 파일만 선택할 수 있습니다.');
+                e.target.value = '';
+            }
+        });
+
+        function dataURLToBlob(dataURL) {
+            const parts = dataURL.split(';base64,');
+            const byteString = atob(parts[1]);
+            const mimeString = parts[0].split(':')[1];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], {type: mimeString});
+        }
+    </script>
+</div>
+<footer>We are P.P</footer>
+</body>
+</html>

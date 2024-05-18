@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사진 선택</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #3a3f52;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #ffffff;
+            font-size: 24px; /* 기본 폰트 사이즈 */
+        }
+
+        .container {
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px; /* 제목 폰트 사이즈 조정 */
+            margin-bottom: 40px; /* 제목과 버튼 간격 조정 */
+            font-weight: 700;
+        }
+
+        button {
+            font-size: 28px; /* 버튼 글씨 크기 조정 */
+            color: #3a3f52;
+            background-color: #6fec02;
+            padding: 20px 30px;
+            margin-top: 10px;
+            margin-bottom: 20px; /* 버튼 간의 간격 조정 */
+            border: none;
+            border-radius: 10px;
+            width: 80%; /* 버튼 너비 조정 */
+            max-width: 300px; /* 최대 너비 설정 */
+            font-weight: 400;
+        }
+
+        #backButton {
+            position: fixed;
+            top: 10px; /* 상단 여백 추가 */
+            left: 10px; /* 좌측 여백 추가 */
+            font-size: 30px; /* 백 아이콘 폰트 사이즈 조정 */
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #3a3f52; /* 아이콘 색상 추가 */
+            padding: 10px; /* 패딩 조정 */
+            width: 70px; /* 버튼 너비 설정 */
+        }
+
+        #convertButton {
+            display: block; /* 블록 요소로 변경하여 가운데 정렬 가능 */
+            margin: 20px auto 0 auto; /* 이미지와 버튼 사이의 간격 추가 */
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #6c757d; /* 회색 */
+            font-size: 18px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+<!-- 뒤로가기 버튼 -->
+<button id="backButton" onclick="history.back()">&#60;</button>
+
+<div class="container">
+    <h1>사진 선택하기</h1>
+    <button id="galleryButton" onclick="document.getElementById('fileInput').click()">Gallery</button>
+    <input type="file" accept="image/*" id="fileInput" style="display:none;">
+    <div id="preview"></div>
+    <button id="convertButton" style="display:none;">Train</button>
+</div>
+
+<script>
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+        var preview = document.getElementById('preview');
+        var convertButton = document.getElementById('convertButton');
+        var galleryButton = document.getElementById('galleryButton');
+        preview.innerHTML = ''; // 미리보기 초기화
+        if (e.target.files.length === 1) { // 한 개의 파일만 허용
+            var file = e.target.files[0];
+            var img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.style.maxWidth = '200px'; // 이미지 크기를 조정하여 보여줌
+            img.style.maxHeight = '200px';
+            img.onload = function () {
+                URL.revokeObjectURL(this.src); // 메모리 해제
+            }
+            preview.appendChild(img);
+            convertButton.style.display = 'block'; // 변환 버튼 표시
+            galleryButton.textContent = 'Reselect'; // 버튼 글씨 변경
+
+            // Add event listener for the convert button
+            convertButton.addEventListener('click', function () {
+                var formData = new FormData();
+                formData.append('train_photo', file, 'train_photo.png');
+                fetch('/save_exclusion_image', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok.');
+                }).then(data => {
+                    console.log(data);
+                    alert('사진이 서버에 성공적으로 저장되었습니다.');
+                    setTimeout(() => { // 500ms 후에 리디렉션
+                        window.location.href = data.redirect_url;
+                    }, 500);
+                }).catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                });
+            });
+        } else {
+            alert('한 개의 이미지만 선택할 수 있습니다.');
+            e.target.value = ''; // 파일 입력 재설정
+        }
+    });
+</script>
+<footer>We are P.P</footer>
+</body>
+</html>

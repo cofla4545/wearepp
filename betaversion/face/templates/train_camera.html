@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera App</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #3a3f52;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            text-align: center;
+        }
+
+        #camera, #photoPreview {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+        }
+
+        button {
+            font-size: 24px;
+            color: #3a3f52;
+            background-color: #6fec02;
+            padding: 20px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button img {
+            margin-right: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        video, img {
+            cursor: pointer;
+        }
+
+        #backButton {
+            position: fixed;
+            top: 10px;
+            left: 0;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #3a3f52;
+            padding: 10px;
+            width: 70px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #6c757d;
+            font-size: 18px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+<!-- Back 버튼 -->
+<button id="backButton" onclick="history.back()">&#60;</button>
+<div class="container">
+    <video id="camera" autoplay muted playsinline></video>
+    <img id="photoPreview" class="hide"/>
+    <div class="button-container">
+        <button id="photoButton"><img src="https://img.icons8.com/material-outlined/24/000000/camera.png"/> Take Photo
+        </button>
+        <button id="retakeButton" class="hide">Retake</button>
+        <button id="TrainButton" class="hide">Train</button>
+    </div>
+</div>
+<script>
+    const camera = document.getElementById('camera');
+    const photoPreview = document.getElementById('photoPreview');
+    const photoButton = document.getElementById('photoButton');
+    const retakeButton = document.getElementById('retakeButton');
+    const TrainButton = document.getElementById('TrainButton');
+    let stream = null;
+
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
+            .then(function (s) {
+                stream = s;
+                camera.srcObject = stream;
+                photoButton.classList.remove('hide');
+            }).catch(function (err) {
+            console.error(err);
+        });
+    }
+
+    startCamera();
+
+    photoButton.onclick = function () {
+        takePhoto();
+    };
+
+    function takePhoto() {
+        const canvas = document.createElement('canvas');
+        canvas.width = camera.videoWidth;
+        canvas.height = camera.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/png');
+        photoPreview.src = dataUrl;
+        photoPreview.classList.remove('hide');
+        camera.classList.add('hide');
+        retakeButton.classList.remove('hide');
+        TrainButton.classList.remove('hide');
+        photoButton.classList.add('hide');
+    }
+
+    retakeButton.onclick = function () {
+        photoPreview.classList.add('hide');
+        retakeButton.classList.add('hide');
+        TrainButton.classList.add('hide');
+        photoButton.classList.remove('hide');
+        camera.classList.remove('hide');
+    };
+
+    TrainButton.onclick = function (event) {
+        event.preventDefault();
+        const canvas = document.createElement('canvas');
+        canvas.width = camera.videoWidth;
+        canvas.height = camera.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(function (blob) {
+            const formData = new FormData();
+            formData.append('train_photo', blob, 'train_photo.png');
+            fetch('/save_exclusion_image', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            }).then(data => {
+                console.log(data);
+                alert('사진이 서버에 성공적으로 저장되었습니다.');
+                window.location.href = data.redirect_url; // index.html로 이동
+            }).catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+            });
+        }, 'image/png');
+    };
+
+    window.onload = startCamera;
+</script>
+<footer>We are P.P</footer>
+</body>
+</html>

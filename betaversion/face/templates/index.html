@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- 필수 메타 태그 -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+
+    <title>Privacy Protector</title>
+
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #3a3f52;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* 화면 전체 높이에 가운데 정렬 */
+            margin: 0; /* 바디 마진 제거 */
+        }
+
+        h1 {
+            font-size: 50px;
+            font-weight: 700;
+            text-align: center; /* 텍스트 가운데 정렬 */
+            margin-bottom: 40px; /* 아래쪽 여백 추가 */
+        }
+
+        p {
+            font-size: 24px;
+            font-weight: 300;
+            color: #53627C;
+            margin-bottom: 30px;
+            text-align: center; /* 텍스트 가운데 정렬 */
+        }
+
+        /* 특정 문단 사이의 간격 조정 */
+        .p-close {
+            margin-bottom: 10px; /* 두 문단 사이 간격 줄이기 */
+        }
+
+        /* 버튼 스타일 */
+        .btn-regular {
+            background-color: #6fec02;
+            color: #3a3f52;
+            padding: 10px 20px; /* 버튼 내부 여백 수정 */
+            font-size: 30px;
+            font-weight: 400;
+            letter-spacing: .1em;
+            display: block; /* 블록 요소로 변경하여 중앙 정렬 */
+            margin: 20px auto; /* 수직 가운데 정렬 및 위아래 여백 추가 */
+            border-radius: 3px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, .05);
+            width: calc(50% - 20px); /* 가로 사이즈를 현재의 절반으로 조정 */
+            max-width: 200px;
+        }
+
+        /* 이미지 스타일 */
+        #logo {
+            width: 50%; /* 이미지 가로 크기를 조정 */
+            max-width: 200px; /* 최대 가로 크기 제한 */
+            margin-bottom: 20px; /* 아래쪽 여백 추가 */
+            display: block; /* 이미지를 블록 요소로 변경하여 중앙 정렬 */
+            margin-left: auto; /* 좌우 여백 자동으로 설정 */
+            margin-right: auto; /* 좌우 여백 자동으로 설정 */
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #6c757d; /* 회색 */
+            font-size: 18px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+
+<!-- H E R O -->
+<section id="hero">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                <img id="logo" src="../static/images/pp.jpg" class="img-fluid" alt="Privacy Protector Logo">
+            </div>
+            <div class="col-md-7 content-box hero-content">
+                <h1><b>Privacy Protector</b></h1>
+                <p class="p-close">한 장의 사진으로 간편한 학습</p>
+                <p>마법 같은 인물 모자이크 경험!</p>
+                <a href="/camera" class="btn btn-regular btn-large">Camera</a>
+                <a href="/gallery" class="btn btn-regular btn-large">Gallery</a>
+                <a href="/train" class="btn btn-regular btn-large">Train</a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- E N D  H E R O -->
+
+<footer>We are P.P</footer>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Preview</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #3a3f52;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background-color: #ffffff;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            text-align: center;
+        }
+
+        #videoPreview {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 24px;
+            color: #3a3f52;
+            background-color: #6fec02;
+            padding: 20px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        #backButton {
+            position: fixed;
+            top: 10px;
+            left: 0;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #3a3f52;
+            padding: 10px;
+            width: 70px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #6c757d;
+            font-size: 18px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+<!-- Back 버튼 -->
+<button id="backButton" onclick="history.back()">&#60;</button>
+<div class="container">
+    <video id="videoPreview" controls></video>
+    <div class="button-container">
+        <a id="downloadLink" download="result_webcam_video_with_audio.mp4">
+            <button>Download</button>
+        </a>
+    </div>
+</div>
+<footer>We are P.P</footer>
+<script>
+    const videoPreview = document.getElementById('videoPreview');
+    const downloadLink = document.getElementById('downloadLink');
+
+    const resultVideoUrl = "{{ result_video_url }}"; // Get result video URL from template context
+
+    if (resultVideoUrl) {
+        videoPreview.src = resultVideoUrl;
+        videoPreview.type = "video/mp4"; // Ensure correct MIME type
+        downloadLink.href = resultVideoUrl;
+        downloadLink.download = 'result_webcam_video_with_audio.mp4';
+
+        videoPreview.onloadeddata = function () {
+            console.log("Video successfully loaded.");
+        };
+
+        videoPreview.onerror = function () {
+            console.error("Error loading video.");
+            alert('Video failed to load.');
+            window.location.href = 'camera.html';
+        };
+    } else {
+        alert('No video found');
+        window.location.href = 'camera.html';
+    }
+</script>
+</body>
+</html>
